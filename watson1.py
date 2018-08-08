@@ -26,7 +26,7 @@ tone_analyzer.set_detailed_response(False)
 #text = 'Team, I know that times are tough! Product sales have been disappointing for the past three quarters. We have a competitive product, but we need to do a better job of selling it!'
 content_type = 'application/json'
 
-text = "Go to the darkest sky you can find. A beach is great. Near a park or cemetery is good, too. If the sky is overcast, you will not see the planets. I actually have to say this. The planets will be visible in this pattern all week. Keep looking up!"
+text = "When in the course of human events, it becomes necessary to one people to dissolve the political bands which have connected them with another, a decent respect for the opinions of mankind compels them to list the reasons for their separation."
 
 # content_type = 'text/plain'
 
