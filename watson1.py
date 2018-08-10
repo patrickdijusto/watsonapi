@@ -51,7 +51,7 @@ def getCurrent(pastNumber):
 	putput=[]
 	
 	
-	St = api.GetUserTimeline(0,"realDonaldTrump",pastNumber,0,1)
+	St = api.GetUserTimeline(0,"botrandrussell",pastNumber,0,1)
 	
 	writeLog("Gotten current: ", 1, "a")
 
@@ -79,8 +79,8 @@ def getCurrent(pastNumber):
 	
 	out_text = mid_text.lstrip()
 	
+	print(out_text)	
 	
-	print(out_text)
 	putput.append(out_text)
 
 	
@@ -124,22 +124,7 @@ writePast(outlist[0])
 
 # if (currentNumber > pastNumber):
         # postReply(TweetText, currentNumber)
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+						
 tone_analyzer = ToneAnalyzerV3(
     version='2017-09-21',
     username='419a0281-d84a-4281-bc03-3def84761f7f',
@@ -151,29 +136,32 @@ tone_analyzer.set_url('https://gateway.watsonplatform.net/tone-analyzer/api')
 
 tone_analyzer.set_detailed_response(False)
 
-
-
-
-
-
-
-
-
-
-# text = 'Team, I know that times are tough! Product sales have been disappointing for the past three quarters. We have a competitive product, but we need to do a better job of selling it!'
 content_type = 'application/json'
 
-# ##text = "When in the course of human events, it becomes necessary to one people to dissolve the political bands which have connected them with another, a decent respect for the opinions of mankind compels them to list the reasons for their separation."
-
-# # content_type = 'text/plain'
 
 try:
-	tone = tone_analyzer.tone({"text": outlist[1]},content_type, True)
+	if(outlist[1][:2] != "RT"):
+		tone = tone_analyzer.tone({"text": outlist[1]},content_type, True)
 except WatsonApiException as ex:
 #except:
     print "Method failed with status code " + str(ex.code) + ": " + ex.message
 	#print("Failure!")
 
 
-##print(tone)	
 print(json.dumps(tone, indent=2))
+
+print(tone)	
+
+print(tone[u'document_tone'][u'tones'][0][u'tone_name'])
+print(tone[u'document_tone'][u'tones'][0][u'score'])
+
+print(tone[u'document_tone'][u'tones'][1][u'tone_name'])
+print(tone[u'document_tone'][u'tones'][1][u'score'])
+
+
+
+
+print(tone["document_tone.tones.score"])
+
+
+
