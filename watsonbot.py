@@ -1,5 +1,5 @@
 import json
-import datetime
+import time
 import re
 from unicodedata import normalize
 from watson_developer_cloud import ToneAnalyzerV3
@@ -36,8 +36,6 @@ def getMentions():
 	##print(json.dumps("["+ment[0]+"]", indent=2))
 
 	
-	
-	
 	print(ment[0])
 	print("\n\n")
 	reply = ment[0].user.screen_name
@@ -52,11 +50,12 @@ def getMentions():
 	# print("\n\n\n\n\n\n\n\n\n")
 	
 	# stat=api.GetStatus(ment[0])
-	# print("\n\n\nLast status:")
-	# print(stat)
+	print("\n\n\n ID:")
+	print(ment[0].id)
 	# print("\n\n\n\n\n\n\n\n\n")
 	namename.append(reply)
 	namename.append(handler) 
+	namename.append(ment[0].id)
 	
 	return namename
 	
@@ -80,7 +79,7 @@ def getPast():
 
 	flx.close()
 
-	writeLog("Writing past number: ", int(row), "w")
+	#writeLog("Writing past number: ", int(row), "w")
 	               
 	return int(row)
 
@@ -95,7 +94,13 @@ def getCurrent(onameka):
 	
 	##St = api.GetUserTimeline(0,onameka,pastNumber,0,1)
 	
-	St = api.GetUserTimeline(screen_name=onameka,count=1)
+	try:
+		St = api.GetUserTimeline(screen_name=onameka,count=1)
+	except Exception as err:
+	#except twitter.error.TwitterError as err:
+		return 0
+	
+	
 	
 	writeLog("Gotten current: ", 1, "a")
 
@@ -144,11 +149,11 @@ def writePast(ccc):
 def writeLog(TweetText, currentNumber, mode):
 
         ##print("Writing a log...")
-        now = datetime.datetime.now()
-        message = "\n"+str(now)
+        # now = datetime.datetime.now()
+        # message = "\n"+str(now)
         
         fly = open("writeLog.txt", mode)
-        fly.write(message)
+        # fly.write(message)
         fly.write(TweetText)
         fly.write(str(currentNumber))
         fly.close()
@@ -204,7 +209,7 @@ def parser(tone):
 	try:
 		t0=(tone[u'document_tone'][u'tones'][0][u'tone_name'])
 		s0=(tone[u'document_tone'][u'tones'][0][u'score'])
-		result+="\nThis tweet gets %s out of 100 for %s" % ((s0* 100),t0)
+		result+="\n\r%s out of 100 for %s" % ((s0* 100),t0)
 	except:
 		result+=('\nNothing to report')
 
@@ -212,7 +217,7 @@ def parser(tone):
 	try:	
 		t1=(tone[u'document_tone'][u'tones'][1][u'tone_name'])
 		s1=(tone[u'document_tone'][u'tones'][1][u'score'])
-		result.append("This tweet gets %s out of 100 for %s" % ((s1* 100),t1))
+		result+="\n\r%s out of 100 for %s" % ((s1* 100),t1)
 	except:
 		print('Nothing further to report')
 		
@@ -221,7 +226,7 @@ def parser(tone):
 	try:
 		t2=(tone[u'document_tone'][u'tones'][2][u'tone_name'])
 		s2=(tone[u'document_tone'][u'tones'][2][u'score'])
-		result.append("This tweet gets %s out of 100 for %s" % ((s2* 100),t2))
+		result+="\n\r%s out of 100 for %s" % ((s2* 100),t2)
 	except:
 		print('Nothing further to report')
 		
@@ -229,7 +234,7 @@ def parser(tone):
 	try:	
 		t3=(tone[u'document_tone'][u'tones'][3][u'tone_name'])
 		s3=(tone[u'document_tone'][u'tones'][3][u'score'])
-		result+="This tweet gets %s out of 100 for %s" % ((s3* 100),t3)
+		result+="\n\r%s out of 100 for %s" % ((s3* 100),t3)
 	except:
 		print('Nothing further to report')
 		
@@ -238,36 +243,43 @@ def parser(tone):
 
 def answer(names, text):
 
+	reply = "@"+names[0]+ " : "
+
 	if(text =="RT"):
-		reply ="@"+names[0]+ " : The last tweet from "+names[1]+" was a retweet and therefore unsuitable for analysis."
+		reply +="The last tweet from "+names[1]+" was a retweet and therefore unsuitable for analysis."
+	elif (text =="NO"):
+		reply +="The user "+names[1]+" doesn't seem to exist."
 	else:
-		reply = "@"+names[0]+ " : The last tweet from "+names[1]+" gets: \n"+text
+		reply = "The last tweet from "+names[1]+" gets: \n"+text
 	
 	print(reply)
 	api.PostUpdate(reply)
 	
 		
 		
+if __name__ == "__main__":		
 		
-		
-api = estapi()		
+	api = estapi()		
 
-names= getMentions()
-		
-# pastNumber = getPast()
-
-# ##print ("Past number is:")
-
-# ##print (pastNumber)
-
-outlist = getCurrent(names[1])
-
-# ##print(outlist)
-
-# writePast(outlist[0])
-
-if(outlist[1][:2] != "RT"):
-	results = parser(watsonapi())
-	answer(names, results)
-else:
-	answer(names, "RT")
+	while(1):
+		names= getMentions()
+		pastNumber = getPast()
+		print("Past number is:")
+		print(pastNumber)
+		print("Current number is:")
+		print(names[2])
+		if(pastNumber<names[2]):
+			outlist = getCurrent(names[1])
+			print(outlist)
+			if(outlist!=0):
+				writePast(names[2])
+				if(outlist[1][:2] != "RT"):
+					results = parser(watsonapi())
+					answer(names, results)
+				else:
+					answer(names, "RT")
+			else:
+				answer(names,"NO")
+		else:
+			time.sleep(60)
+		time.sleep(60)
