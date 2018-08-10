@@ -250,7 +250,7 @@ def answer(names, text):
 	elif (text =="NO"):
 		reply +="The user "+names[1]+" doesn't seem to exist."
 	else:
-		reply = "The last tweet from "+names[1]+" gets: \n"+text
+		reply += "The last tweet from "+names[1]+" gets: \n"+text
 	
 	print(reply)
 	api.PostUpdate(reply)
